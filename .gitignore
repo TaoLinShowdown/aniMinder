@@ -1,5 +1,7 @@
 node_modules/**/*
 .expo/*
+frontend-mobile/.expo/*
+frontend-mobile/node_modules/**/*
 npm-debug.*
 *.jks
 *.p8
