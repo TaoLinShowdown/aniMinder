@@ -13,7 +13,9 @@ const initialData: storeType = {
     followAnime: () => null,
     unfollowAnime: () => null,
     changeFollowingNeedToReload: () => null,
+    changeQuery: () => null,
     animeData: [],
+    animeDataDisplayed: [],
     followingData: [],
     listLoading: false,
     followingLoading: false,
@@ -21,6 +23,7 @@ const initialData: storeType = {
     fontsLoaded: false,
     seasonalScrollOffsetY: new Animated.Value(0),
     followingScrollOffsetY: new Animated.Value(0),
+    query: "",
 }
 
 export const StoreContext = createContext<storeType>(initialData);
@@ -35,6 +38,7 @@ export function useStoreContextValue(): storeType {
     const [ followingNeedToReload, setFollowingNeedToReload ] = useState<boolean>(false);
     const [ seasonalSortOrder, setSeasonalSortOrder ] = useState<string[]>(["TITLE", "false"]);
     const [ followingSortOrder, setFollowingSortOrder ] = useState<string[]>(["AIRING", "false"]);
+    const [ query, setQuery ] = useState<string>("");
     const seasonalScrollOffsetY = useRef(new Animated.Value(0)).current;
     const followingScrollOffsetY = useRef(new Animated.Value(0)).current;
 
@@ -54,6 +58,10 @@ export function useStoreContextValue(): storeType {
         setFollowingNeedToReload(reload);
     }, [setFollowingNeedToReload]);
 
+    const changeQuery = useCallback((q: string) => {
+        setQuery(q);
+    }, [setQuery])
+
     useEffect(() => {
         if (!listLoading) {
             getSeasonalList();
@@ -66,9 +74,28 @@ export function useStoreContextValue(): storeType {
         }
     }, [followingSortOrder])
 
+    useEffect(() => {
+        generateDisplayData();
+    }, [animeData])
+
+    useEffect(() => {
+        generateDisplayData();
+    }, [query])
+
+    const generateDisplayData = useCallback(() => {
+        if(query === "") {
+            setAnimeDataDisplayed(animeData);
+        } else {
+            setAnimeDataDisplayed(animeData.filter((anime: anime) => {
+                return (anime.title.english !== null && anime.title.english.includes(query)) ||
+                        (anime.title.romaji !== null && anime.title.romaji.includes(query)) ||
+                        (anime.title.native !== null && anime.title.native.includes(query));
+            }))
+        }
+    }, [setAnimeDataDisplayed, animeData, query])
+
     const getSeasonalList = useCallback(() => {
         setListLoading(true);
-        // setAnimeData([]);
         let url = `${api_url}/getSeason?season=WINTER&seasonYear=2021&sort=${seasonalSortOrder[0]}&reverse=${seasonalSortOrder[1]}`;
         let options = {
             method: 'GET',
@@ -88,11 +115,10 @@ export function useStoreContextValue(): storeType {
         .catch(err => { 
             console.error(err);
         });
-    }, [animeData, setAnimeData, listLoading, setListLoading, seasonalSortOrder])
+    }, [animeData, setAnimeData, listLoading, setListLoading, seasonalSortOrder, generateDisplayData])
 
     const getFollowingList = useCallback(() => {
         setFollowingLoading(true);
-        // setFollowingData([]);
         let url = `${api_url}/getUser?sort=${followingSortOrder[0]}&reverse=${followingSortOrder[1]}`;
         let options = {
             method: 'POST',
@@ -173,7 +199,9 @@ export function useStoreContextValue(): storeType {
         followAnime,
         unfollowAnime,
         changeFollowingNeedToReload,
+        changeQuery,
         animeData,
+        animeDataDisplayed,
         followingData,
         listLoading,
         followingLoading,
@@ -181,5 +209,6 @@ export function useStoreContextValue(): storeType {
         fontsLoaded,
         seasonalScrollOffsetY,
         followingScrollOffsetY,
+        query
     }
 }

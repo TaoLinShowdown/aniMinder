@@ -5,66 +5,33 @@ import { StoreContext } from '../store/store';
 import SeasonalListNav from './SeasonalListNav';
 
 export default function SeasonalList() {
-    const { animeData, 
+    const { animeDataDisplayed,
             seasonalScrollOffsetY, 
-            listLoading, 
-            getSeasonalList, 
+            listLoading,
+            getSeasonalList,
         } = useContext(StoreContext);
 
     const [ notifAnimeName, setNotifAnimeName ] = useState<String>("");
     let flatListRef = useRef<FlatList | null>(null);
 
-    const HeaderComponent = () => {
-        return (
-            <React.Fragment>
-                <Image style={{ width: 60, height: 60, marginBottom: 30 }} source={require('../assets/Spin-1s-200px.gif')}/>
-                <View style={{
-                    height: 40,
-                    width: '98%',
-                    margin: 6,
-                    shadowOpacity: 0.1,
-                    shadowOffset: {
-                        width: 0,
-                        height: 3
-                    },
-                }}>
-                    <TextInput 
-                        placeholder="Search for title"
-                        onChangeText={handleSearch}
-                        style={{
-                            height: 40,
-                            width: '100%',
-                            padding: 10,
-                            backgroundColor: 'white',
-                            borderRadius: 10,
-                            fontFamily: 'Overpass-Regular',
-                        }} 
-                        autoCorrect={false}
-                    />
-                </View>
-            </React.Fragment>
-        );
-    }
-
-    const handleSearch = (text: string) => {
-        console.log(text);
-    }
+    const HeaderComponent = () =>
+        <Image style={{ width: 60, height: 60, marginBottom: 80 }} source={require('../assets/Spin-1s-200px.gif')}/>
 
     const emptyComponent = () => 
-    <View style={{
-        flex: 1,
-        paddingTop: 200,
-        justifyContent: 'center',
-        alignItems: 'center',
-    }}>
-        <Text style={{
-            fontFamily: 'Overpass-Bold',
-            fontSize: 20,
-            color: 'rgb(110,133,158)',
+        <View style={{
+            flex: 1,
+            paddingTop: 200,
+            justifyContent: 'center',
+            alignItems: 'center',
         }}>
-            Loading...
-        </Text>
-    </View>
+            <Text style={{
+                fontFamily: 'Overpass-Bold',
+                fontSize: 20,
+                color: 'rgb(110,133,158)',
+            }}>
+                Loading...
+            </Text>
+        </View>
 
     const notifTranslateYAnim = useRef<Animated.Value>(new Animated.Value(0));
     const notifAnim = () => {
@@ -126,7 +93,7 @@ export default function SeasonalList() {
                 }}
                 scrollEventThrottle={16}
                 onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: seasonalScrollOffsetY } } }], { useNativeDriver: false })}
-                data={animeData}
+                data={animeDataDisplayed}
                 ListHeaderComponent={HeaderComponent}
                 ListHeaderComponentStyle={{ alignItems: 'center' }}
                 ListEmptyComponent={emptyComponent}

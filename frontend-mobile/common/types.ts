@@ -37,14 +37,17 @@ export interface storeType {
     followAnime: (animeIds: number[], callback: () => void) => void,
     unfollowAnime: (animeIds: number[], callback: () => void) => void,
     changeFollowingNeedToReload: (reload: boolean) => void,
+    changeQuery: (q: string) => void,
     animeData: anime[],
+    animeDataDisplayed: anime[],
     followingData: anime[],
     listLoading: boolean,
     followingLoading: boolean,
     followingNeedToReload: boolean,
     fontsLoaded: boolean,
     seasonalScrollOffsetY: Animated.Value
-    followingScrollOffsetY: Animated.Value
+    followingScrollOffsetY: Animated.Value,
+    query: string,
 }
 
 export interface SeasonalListNavProps {
