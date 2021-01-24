@@ -1,7 +1,7 @@
 import { useFonts } from 'expo-font';
 import { Ionicons } from '@expo/vector-icons';
 import React, { useContext, useEffect, useState } from 'react';
-import { View, Text } from 'react-native';
+import { View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
@@ -14,7 +14,12 @@ import { RootStackParamList } from '../common/types';
 const Tab = createBottomTabNavigator<RootStackParamList>();
 
 export default function Index() {
-    let { changeFontsLoaded, getSeasonalList, getFollowingList } = useContext(StoreContext);
+    const { changeFontsLoaded, 
+            getSeasonalList, 
+            getFollowingList, 
+            changeFollowingNeedToReload,
+            followingNeedToReload, 
+        } = useContext(StoreContext);
 
     let [ fontsLoaded ] = useFonts({
         'Overpass-Black': require('../assets/fonts/Overpass-Black.ttf'),
@@ -41,7 +46,8 @@ export default function Index() {
         return (
             <NavigationContainer
                 onStateChange={(state) => {
-                    if (state && state?.index === 0) {
+                    if (state && state?.index === 0 && followingNeedToReload) {
+                        changeFollowingNeedToReload(false);
                         getFollowingList();
                     }
                 }}>

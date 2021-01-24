@@ -36,10 +36,12 @@ export interface storeType {
     changeFollowingOrder: (order: string[]) => void,
     followAnime: (animeIds: number[], callback: () => void) => void,
     unfollowAnime: (animeIds: number[], callback: () => void) => void,
+    changeFollowingNeedToReload: (reload: boolean) => void,
     animeData: anime[],
     followingData: anime[],
     listLoading: boolean,
     followingLoading: boolean,
+    followingNeedToReload: boolean,
     fontsLoaded: boolean,
     seasonalScrollOffsetY: Animated.Value
     followingScrollOffsetY: Animated.Value

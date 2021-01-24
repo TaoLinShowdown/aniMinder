@@ -1,9 +1,8 @@
-import React, { createContext, useCallback, useState, useRef, useEffect } from 'react';
+import { createContext, useCallback, useState, useRef, useEffect } from 'react';
 import { Animated } from 'react-native';
 import Constants from 'expo-constants';
 import { storeType, anime } from '../common/types';
-import { api_url, H_MAX_HEIGHT, H_MIN_HEIGHT, H_SCROLL_DISTANCE } from '../common/constants';
-import { call } from 'react-native-reanimated';
+import { api_url } from '../common/constants';
 
 const initialData: storeType = {
     changeFontsLoaded: () => null,
@@ -13,10 +12,12 @@ const initialData: storeType = {
     changeFollowingOrder: () => null,
     followAnime: () => null,
     unfollowAnime: () => null,
+    changeFollowingNeedToReload: () => null,
     animeData: [],
     followingData: [],
     listLoading: false,
     followingLoading: false,
+    followingNeedToReload: false,
     fontsLoaded: false,
     seasonalScrollOffsetY: new Animated.Value(0),
     followingScrollOffsetY: new Animated.Value(0),
@@ -26,10 +27,12 @@ export const StoreContext = createContext<storeType>(initialData);
 
 export function useStoreContextValue(): storeType {
     const [ animeData, setAnimeData ] = useState<anime[]>([]);
+    const [ animeDataDisplayed, setAnimeDataDisplayed ] = useState<anime[]>([]);
     const [ followingData, setFollowingData ] = useState<anime[]>([]);
     const [ fontsLoaded, setFontsLoaded ] = useState<boolean>(false);
     const [ listLoading, setListLoading ] = useState<boolean>(false);
     const [ followingLoading, setFollowingLoading ] = useState<boolean>(false);
+    const [ followingNeedToReload, setFollowingNeedToReload ] = useState<boolean>(false);
     const [ seasonalSortOrder, setSeasonalSortOrder ] = useState<string[]>(["TITLE", "false"]);
     const [ followingSortOrder, setFollowingSortOrder ] = useState<string[]>(["AIRING", "false"]);
     const seasonalScrollOffsetY = useRef(new Animated.Value(0)).current;
@@ -47,6 +50,10 @@ export function useStoreContextValue(): storeType {
         setFollowingSortOrder(order);
     }, [setFollowingSortOrder]);
 
+    const changeFollowingNeedToReload = useCallback((reload: boolean) => {
+        setFollowingNeedToReload(reload);
+    }, [setFollowingNeedToReload]);
+
     useEffect(() => {
         if (!listLoading) {
             getSeasonalList();
@@ -62,8 +69,8 @@ export function useStoreContextValue(): storeType {
     const getSeasonalList = useCallback(() => {
         setListLoading(true);
         // setAnimeData([]);
-        var url = `${api_url}/getSeason?season=WINTER&seasonYear=2021&sort=${seasonalSortOrder[0]}&reverse=${seasonalSortOrder[1]}`;
-        var options = {
+        let url = `${api_url}/getSeason?season=WINTER&seasonYear=2021&sort=${seasonalSortOrder[0]}&reverse=${seasonalSortOrder[1]}`;
+        let options = {
             method: 'GET',
             headers: {
                 'Content-Type': 'application/json',
@@ -86,8 +93,8 @@ export function useStoreContextValue(): storeType {
     const getFollowingList = useCallback(() => {
         setFollowingLoading(true);
         // setFollowingData([]);
-        var url = `${api_url}/getUser?sort=${followingSortOrder[0]}&reverse=${followingSortOrder[1]}`;
-        var options = {
+        let url = `${api_url}/getUser?sort=${followingSortOrder[0]}&reverse=${followingSortOrder[1]}`;
+        let options = {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -110,8 +117,8 @@ export function useStoreContextValue(): storeType {
     }, [followingData, setFollowingData, followingLoading, setFollowingLoading, followingSortOrder])
 
     const followAnime = useCallback((animeIds: number[], callback: () => void) => {
-        var url = `${api_url}/updateUser`;
-        var options = {
+        let url = `${api_url}/updateUser`;
+        let options = {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -125,6 +132,7 @@ export function useStoreContextValue(): storeType {
         }
         fetch(url, options)
         .then(() => {
+            setFollowingNeedToReload(true);
             callback();
         })
         .catch(err => {
@@ -133,8 +141,8 @@ export function useStoreContextValue(): storeType {
     }, [followingData, setFollowingData])
 
     const unfollowAnime = useCallback((animeIds: number[], callback: () => void) => {
-        var url = `${api_url}/updateUser`;
-        var options = {
+        let url = `${api_url}/updateUser`;
+        let options = {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -164,10 +172,12 @@ export function useStoreContextValue(): storeType {
         changeFollowingOrder,
         followAnime,
         unfollowAnime,
+        changeFollowingNeedToReload,
         animeData,
         followingData,
         listLoading,
         followingLoading,
+        followingNeedToReload,
         fontsLoaded,
         seasonalScrollOffsetY,
         followingScrollOffsetY,

@@ -6,7 +6,9 @@ import { FollowingListNavProps } from '../common/types'
 import { H_MAX_HEIGHT, H_MIN_HEIGHT, H_SCROLL_DISTANCE } from '../common/constants';
 
 export default function FollowingListNav({ flatListRef }: FollowingListNavProps) {
-    let { followingScrollOffsetY, changeFollowingOrder } = useContext(StoreContext);
+    const { followingScrollOffsetY, 
+            changeFollowingOrder 
+        } = useContext(StoreContext);
 
     const headerScrollHeight = followingScrollOffsetY.interpolate({
         inputRange: [0, H_SCROLL_DISTANCE],

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useRef, useState } from 'react'
+import React, { useContext, useRef, useState } from 'react'
 import { View, FlatList, Animated, Image, Text } from 'react-native';
 import { StoreContext } from '../store/store';
 
@@ -6,7 +6,11 @@ import AnimeCard from './AnimeCard';
 import FollowingListNav from './FollowingListNav';
 
 export default function FollowingList() {
-    const { followingData, followingScrollOffsetY, getFollowingList, followingLoading } = useContext(StoreContext);
+    const { followingData, 
+            followingScrollOffsetY, 
+            followingLoading,
+            getFollowingList, 
+        } = useContext(StoreContext);
     const [ notifAnimeName, setNotifAnimeName ] = useState<String>("");
     let flatListRef = useRef<FlatList | null>(null);
 

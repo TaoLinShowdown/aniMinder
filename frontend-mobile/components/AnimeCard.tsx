@@ -7,7 +7,10 @@ import { anime, AnimeCardProps } from '../common/types';
 import { StoreContext } from '../store/store';
 
 export default memo<AnimeCardProps>(props => {
-    let { fontsLoaded, followAnime, unfollowAnime } = useContext(StoreContext);
+    const { fontsLoaded, 
+            followAnime, 
+            unfollowAnime, 
+        } = useContext(StoreContext);
     let animeData: anime = props.animeData;
     let title: string | null = animeData.title.english === null ? animeData.title.romaji === null ? animeData.title.native : animeData.title.romaji : animeData.title.english;
     let studioList: string[] = [];

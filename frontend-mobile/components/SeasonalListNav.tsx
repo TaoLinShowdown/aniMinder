@@ -1,13 +1,15 @@
 import React, { useContext } from 'react';
-import { View, Animated, ActionSheetIOS } from 'react-native';
+import { Animated, ActionSheetIOS } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { StoreContext } from '../store/store';
 import { H_MAX_HEIGHT, H_MIN_HEIGHT, H_SCROLL_DISTANCE } from '../common/constants';
 import { SeasonalListNavProps } from '../common/types';
 
 export default function SeasonalListNav({ season, year, flatListRef }: SeasonalListNavProps) {
+    const { seasonalScrollOffsetY, 
+            changeSeasonalOrder,
+        } = useContext(StoreContext);
 
-    let { seasonalScrollOffsetY, changeSeasonalOrder } = useContext(StoreContext);
     const headerScrollHeight = seasonalScrollOffsetY.interpolate({
         inputRange: [0, H_SCROLL_DISTANCE],
         outputRange: [H_MAX_HEIGHT, H_MIN_HEIGHT],

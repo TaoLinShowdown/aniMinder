@@ -1,17 +1,54 @@
 import React, { useContext, useRef, useState } from 'react';
-import { Animated, View, FlatList, Image, Text } from 'react-native';
+import { Animated, View, FlatList, Image, Text, TextInput } from 'react-native';
 import AnimeCard from './AnimeCard';
 import { StoreContext } from '../store/store';
 import SeasonalListNav from './SeasonalListNav';
 
 export default function SeasonalList() {
+    const { animeData, 
+            seasonalScrollOffsetY, 
+            listLoading, 
+            getSeasonalList, 
+        } = useContext(StoreContext);
 
-    const { animeData, seasonalScrollOffsetY, listLoading, getSeasonalList } = useContext(StoreContext);
     const [ notifAnimeName, setNotifAnimeName ] = useState<String>("");
     let flatListRef = useRef<FlatList | null>(null);
 
-    const headerComponent = () => 
-    <Image style={{ width: 60, height: 60 }} source={require('../assets/Spin-1s-200px.gif')}/>
+    const HeaderComponent = () => {
+        return (
+            <React.Fragment>
+                <Image style={{ width: 60, height: 60, marginBottom: 30 }} source={require('../assets/Spin-1s-200px.gif')}/>
+                <View style={{
+                    height: 40,
+                    width: '98%',
+                    margin: 6,
+                    shadowOpacity: 0.1,
+                    shadowOffset: {
+                        width: 0,
+                        height: 3
+                    },
+                }}>
+                    <TextInput 
+                        placeholder="Search for title"
+                        onChangeText={handleSearch}
+                        style={{
+                            height: 40,
+                            width: '100%',
+                            padding: 10,
+                            backgroundColor: 'white',
+                            borderRadius: 10,
+                            fontFamily: 'Overpass-Regular',
+                        }} 
+                        autoCorrect={false}
+                    />
+                </View>
+            </React.Fragment>
+        );
+    }
+
+    const handleSearch = (text: string) => {
+        console.log(text);
+    }
 
     const emptyComponent = () => 
     <View style={{
@@ -85,13 +122,13 @@ export default function SeasonalList() {
             <FlatList 
                 contentContainerStyle={{
                     backgroundColor: 'rgb(237,241,245)',
-                    paddingTop: 20
+                    paddingTop: 60
                 }}
                 scrollEventThrottle={16}
                 onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: seasonalScrollOffsetY } } }], { useNativeDriver: false })}
                 data={animeData}
-                ListHeaderComponent={headerComponent}
-                ListHeaderComponentStyle={{ alignItems: 'center', paddingBottom: 70 }}
+                ListHeaderComponent={HeaderComponent}
+                ListHeaderComponentStyle={{ alignItems: 'center' }}
                 ListEmptyComponent={emptyComponent}
                 renderItem={item => <AnimeCard type={"Add"} animeData={item.item} startAnimation={notifAnim} setAnimeName={setNotifAnimeName} />}
                 initialNumToRender={6}
