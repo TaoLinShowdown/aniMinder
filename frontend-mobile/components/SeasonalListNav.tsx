@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { Animated, ActionSheetIOS, TextInput, NativeSyntheticEvent, TextInputEndEditingEventData } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { StoreContext } from '../store/store';
-import { H_MAX_HEIGHT, H_MIN_HEIGHT, H_SCROLL_DISTANCE } from '../common/constants';
+import { H_MAX_HEIGHT, H_MIN_HEIGHT } from '../common/constants';
 import { SeasonalListNavProps } from '../common/types';
 
 export default function SeasonalListNav({ season, year, flatListRef }: SeasonalListNavProps) {

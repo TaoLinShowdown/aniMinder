@@ -3,6 +3,7 @@ import { Animated } from 'react-native';
 import Constants from 'expo-constants';
 import { storeType, anime } from '../common/types';
 import { api_url } from '../common/constants';
+import * as Notifications from 'expo-notifications';
 
 const initialData: storeType = {
     changeFontsLoaded: () => null,
@@ -61,26 +62,6 @@ export function useStoreContextValue(): storeType {
     const changeQuery = useCallback((q: string) => {
         setQuery(q);
     }, [setQuery])
-
-    useEffect(() => {
-        if (!listLoading) {
-            getSeasonalList();
-        }
-    }, [seasonalSortOrder])
-
-    useEffect(() => {
-        if (!followingLoading) {
-            getFollowingList();
-        }
-    }, [followingSortOrder])
-
-    useEffect(() => {
-        generateDisplayData();
-    }, [animeData])
-
-    useEffect(() => {
-        generateDisplayData();
-    }, [query])
 
     const generateDisplayData = useCallback(() => {
         if(query === "") {
@@ -142,6 +123,18 @@ export function useStoreContextValue(): storeType {
         });
     }, [followingData, setFollowingData, followingLoading, setFollowingLoading, followingSortOrder])
 
+    const scheduleNotification = useCallback((anime: anime) => {
+        Notifications.scheduleNotificationAsync({
+            identifier: `${anime.id}`,
+            trigger: {
+                seconds: 30
+            },
+            content: {
+                title: `${anime.title.english} is airing now`
+            }
+        })
+    }, [])
+
     const followAnime = useCallback((animeIds: number[], callback: () => void) => {
         let url = `${api_url}/updateUser`;
         let options = {
@@ -159,12 +152,17 @@ export function useStoreContextValue(): storeType {
         fetch(url, options)
         .then(() => {
             setFollowingNeedToReload(true);
+            scheduleNotification(animeData.filter(anime => anime.id === animeIds[0])[0]);
             callback();
         })
         .catch(err => {
             console.error(err);
         });
     }, [followingData, setFollowingData])
+
+    const unscheduleNotification = useCallback((animeId: number) => {
+        Notifications.cancelScheduledNotificationAsync(`${animeId}`);
+    }, [])
 
     const unfollowAnime = useCallback((animeIds: number[], callback: () => void) => {
         let url = `${api_url}/updateUser`;
@@ -183,12 +181,63 @@ export function useStoreContextValue(): storeType {
         fetch(url, options)
         .then(() => {
             callback();
+            unscheduleNotification(animeIds[0])
             setFollowingData(followingData.filter((anime: anime) => anime.id !== animeIds[0]));
         })
         .catch(err => {
             console.error(err);
         });
     }, [followingData, setFollowingData])
+
+    useEffect(() => {
+        if (!listLoading) {
+            getSeasonalList();
+        }
+    }, [seasonalSortOrder])
+
+    useEffect(() => {
+        if (!followingLoading) {
+            getFollowingList();
+        }
+    }, [followingSortOrder])
+
+    useEffect(() => {
+        generateDisplayData();
+    }, [animeData])
+
+    useEffect(() => {
+        generateDisplayData();
+    }, [query])
+
+    useEffect(() => {
+        (async () => {
+            console.log("[NOTIF] Following Data was updated: updating notifications");
+            let scheduled = await Notifications.getAllScheduledNotificationsAsync();
+
+            // get all the identifiers for the scheduled notifications
+            let scheduledIdentifiers: string[] = [];
+            scheduled.forEach(notif => {
+                scheduledIdentifiers.push(notif.identifier);
+            })
+
+            // schedule notifications for anime that do not have notifications
+            followingData.forEach(async anime => {
+                let id = `${anime.id}`;
+                if (!scheduledIdentifiers.includes(id)) {
+                    console.log(`[NOTIF] added notif for ${anime.title.english}`)
+                    await Notifications.scheduleNotificationAsync({
+                        identifier: id,
+                        trigger: {
+                            seconds: 30
+                        },
+                        content: {
+                            body: `${anime.title.english} is airing woooo`
+                        }
+                    });
+                }
+            });
+        })();
+    }, [followingData])
 
     return {
         changeFontsLoaded,

@@ -4,6 +4,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import { View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import * as Notifications from 'expo-notifications';
 
 import SeasonalList from './SeasonalList';
 import FollowingList from './FollowingList';
@@ -15,7 +16,6 @@ const Tab = createBottomTabNavigator<RootStackParamList>();
 
 export default function Index() {
     const { changeFontsLoaded, 
-            getSeasonalList, 
             getFollowingList, 
             changeFollowingNeedToReload,
             followingNeedToReload, 
@@ -36,9 +36,23 @@ export default function Index() {
 
     useEffect(() => {
         if (!loaded) {
+            console.log("APP STARTED UP, LOADING NOTIFICATIONS");
             setLoaded(true);
-            getFollowingList();
-            getSeasonalList();
+            Notifications.requestPermissionsAsync({
+                ios: {
+                    allowAlert: true,
+                    allowBadge: true,
+                    allowSound: true,
+                    allowAnnouncements: true,
+                }
+            })
+            Notifications.setNotificationHandler({
+                handleNotification: async () => ({
+                    shouldShowAlert: true,
+                    shouldPlaySound: false,
+                    shouldSetBadge: false,
+                }),
+            });
         }
     })
 

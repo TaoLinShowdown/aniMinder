@@ -12,9 +12,7 @@ export interface anime {
         large: string
     },
     nextAiringEpisode: {
-        id: number,
         airingAt: number,
-        timeUntilAiring: number,
         episode: number
     },
     title: {
