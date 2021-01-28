@@ -124,15 +124,15 @@ export function useStoreContextValue(): storeType {
     }, [followingData, setFollowingData, followingLoading, setFollowingLoading, followingSortOrder])
 
     const scheduleNotification = useCallback((anime: anime) => {
-        Notifications.scheduleNotificationAsync({
-            identifier: `${anime.id}`,
-            trigger: {
-                seconds: 30
-            },
-            content: {
-                title: `${anime.title.english} is airing now`
-            }
-        })
+        if (anime.nextAiringEpisode !== null) {
+            Notifications.scheduleNotificationAsync({
+                identifier: `${anime.id}`,
+                trigger: new Date(anime.nextAiringEpisode.airingAt * 1000),
+                content: {
+                    title: `${anime.title.english} is airing now`
+                }
+            });
+        }
     }, [])
 
     const followAnime = useCallback((animeIds: number[], callback: () => void) => {
@@ -158,7 +158,7 @@ export function useStoreContextValue(): storeType {
         .catch(err => {
             console.error(err);
         });
-    }, [followingData, setFollowingData])
+    }, [followingData, setFollowingData, animeData])
 
     const unscheduleNotification = useCallback((animeId: number) => {
         Notifications.cancelScheduledNotificationAsync(`${animeId}`);
@@ -211,7 +211,7 @@ export function useStoreContextValue(): storeType {
 
     useEffect(() => {
         (async () => {
-            console.log("[NOTIF] Following Data was updated: updating notifications");
+            console.log("UPDATING NOTIFICATIONS");
             let scheduled = await Notifications.getAllScheduledNotificationsAsync();
 
             // get all the identifiers for the scheduled notifications
@@ -223,13 +223,11 @@ export function useStoreContextValue(): storeType {
             // schedule notifications for anime that do not have notifications
             followingData.forEach(async anime => {
                 let id = `${anime.id}`;
-                if (!scheduledIdentifiers.includes(id)) {
-                    console.log(`[NOTIF] added notif for ${anime.title.english}`)
+                if (!scheduledIdentifiers.includes(id) && anime.nextAiringEpisode !== null) {
+                    console.log(`   [NOTIF] added notif for ${anime.title.english}`)
                     await Notifications.scheduleNotificationAsync({
                         identifier: id,
-                        trigger: {
-                            seconds: 30
-                        },
+                        trigger: new Date(anime.nextAiringEpisode.airingAt * 1000),
                         content: {
                             body: `${anime.title.english} is airing woooo`
                         }
