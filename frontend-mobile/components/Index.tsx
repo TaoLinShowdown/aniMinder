@@ -5,12 +5,13 @@ import { View } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import * as Notifications from 'expo-notifications';
+import * as ScreenOrientation from 'expo-screen-orientation';
 
 import SeasonalList from './SeasonalList';
 import FollowingList from './FollowingList';
 import Settings from './Settings';
 import { StoreContext } from '../store/store';
-import { RootStackParamList } from '../common/types';
+import { RootStackParamList, anime } from '../common/types';
 
 const Tab = createBottomTabNavigator<RootStackParamList>();
 
@@ -19,6 +20,7 @@ export default function Index() {
             getFollowingList, 
             changeFollowingNeedToReload,
             followingNeedToReload, 
+            animeData,
         } = useContext(StoreContext);
 
     let [ fontsLoaded ] = useFonts({
@@ -38,6 +40,7 @@ export default function Index() {
         if (!loaded) {
             console.log("APP STARTED UP, LOADING NOTIFICATIONS");
             setLoaded(true);
+            ScreenOrientation.lockAsync(ScreenOrientation.OrientationLock.PORTRAIT_UP);
             Notifications.requestPermissionsAsync({
                 ios: {
                     allowAlert: true,
@@ -47,11 +50,24 @@ export default function Index() {
                 }
             })
             Notifications.setNotificationHandler({
-                handleNotification: async () => ({
-                    shouldShowAlert: true,
-                    shouldPlaySound: false,
-                    shouldSetBadge: false,
-                }),
+                handleNotification: async (notif) => {
+                    let theAnime: anime = animeData.filter(anime => `${anime.id}` === notif.request.identifier)[0];
+                    if (theAnime.nextAiringEpisode !== null && (new Date(theAnime.nextAiringEpisode.airingAt * 1000) > (new Date()))) {
+                        console.log(`SCHEDULING NEXT NOTIFICATION FOR ${theAnime.title.english}`);
+                        Notifications.scheduleNotificationAsync({
+                            identifier: notif.request.identifier,
+                            content: {
+                                title: `${theAnime.title.english} ep ${theAnime.nextAiringEpisode.episode} is airing now!`
+                            },
+                            trigger: new Date(theAnime.nextAiringEpisode.airingAt * 1000)
+                        })
+                    }
+                    return {
+                        shouldShowAlert: true,
+                        shouldPlaySound: false,
+                        shouldSetBadge: false,
+                    }
+                },
             });
         }
     })

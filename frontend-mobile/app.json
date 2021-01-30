@@ -17,7 +17,10 @@
       "**/*"
     ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": false,
+      "requireFullScreen": true,
+      "bundleIdentifier": "com.animinder",
+      "buildNumber": "1.0.0"
     },
     "android": {
       "adaptiveIcon": {

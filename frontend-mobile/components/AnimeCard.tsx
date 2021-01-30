@@ -24,7 +24,11 @@ export default memo<AnimeCardProps>(props => {
         if (animeData.episodes !== null && animeData.episodes !== 0) {currEp += ` of ${animeData.episodes}`;}
         currEp += " airing in"
         let airingInHoursMinutesList = dh((animeData.nextAiringEpisode.airingAt * 1000) - Date.now());
-        airingIn = `${ airingInHoursMinutesList[0] !== 0 ? airingInHoursMinutesList[0] + " days, " : "" }${airingInHoursMinutesList[1]} hours`;
+        if ((animeData.nextAiringEpisode.airingAt * 1000) - Date.now() < 0) {
+            airingIn = "Currently Airing"
+        } else {
+            airingIn = `${ airingInHoursMinutesList[0] !== 0 ? airingInHoursMinutesList[0] + " days, " : "" }${airingInHoursMinutesList[1] !== 0 ? airingInHoursMinutesList[1] + " hours, " : ""}${airingInHoursMinutesList[2]} min`;
+        }
         weekday = days[(new Date(animeData.nextAiringEpisode.airingAt * 1000)).getDay()]
     } else {
         weekday = "NO DATA";
@@ -267,7 +271,7 @@ function dh(t: number){
         d++;
         h = 0;
     }
-    return [d, h];
+    return [d, h, m];
 }
 
 const days = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
