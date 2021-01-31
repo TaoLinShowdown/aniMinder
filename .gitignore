@@ -3,6 +3,7 @@ node_modules/**/*
 frontend-mobile/.expo/*
 frontend-mobile/node_modules/**/*
 npm-debug.*
+*.zip
 *.jks
 *.p8
 *.p12
