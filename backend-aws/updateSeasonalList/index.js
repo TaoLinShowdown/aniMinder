@@ -78,55 +78,70 @@ async function getSeasonalList(runId) {
     }
     `
 
-    let variables = {
-        "page": 1,
-    	"format": "TV",
-    	"season": "WINTER",
-    	"seasonYear": 2021,
-    	"perPage": 50
+    // find the current season and year
+    let today = new Date();
+    let year = today.getFullYear();
+    let month = today.getMonth();
+    let season = [["", 0], ["", 0]];
+    if (month >= 0 && month <= 2) {
+        season = [["WINTER", year], ["FALL", year-1]];
+    } else if (month >= 3 && month <= 5) {
+        season = [["SPRING", year], ["WINTER", year]];
+    } else if (month >= 6 && month <= 8) {
+        season = [["SUMMER", year], ["SPRING", year]];
+    } else {
+        season = [["FALL", year], ["SUMMER", year]];
     }
 
-    const options = {
-        method: 'POST',
-        headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-        },
-        body: JSON.stringify({
-                query: query,
-                variables: variables
-        })
-    };
+    console.log(season);
 
     let seasonalList = [];
 
-    console.log(`[${runId}] GETTING PAGE ${variables.page}`)
-    let data = await fetch('https://graphql.anilist.co', options);
-    data = await data.json();
-    let currPage = data.data.Page;
-    let pageInfo = currPage.pageInfo;
-    let media = currPage.media;
-    seasonalList = seasonalList.concat(media);
-
-    while( pageInfo.hasNextPage ) {
-        console.log(`GETTING PAGE ${variables.page + 1}`)
-        variables.page = variables.page + 1;
-        data = await fetch(url, {
+    for (const s of season) {
+        let variables = {
+            "page": 1,
+            "format": "TV",
+            "season": s[0],
+            "seasonYear": s[1],
+            "perPage": 20
+        }
+        let data = await fetch('https://graphql.anilist.co', {
             method: 'POST',
             headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
             },
             body: JSON.stringify({
-                    query: query,
-                    variables: variables
+                query: query,
+                variables: variables
             })
         });
+        console.log(`[${runId}] GETTING PAGE ${variables.page} for season ${s[0]} ${s[1]}`);
         data = await data.json();
-        currPage = data.data.Page;
-        pageInfo = currPage.pageInfo;
-        media = currPage.media;
+        let currPage = data.data.Page;
+        let pageInfo = currPage.pageInfo;
+        let media = currPage.media;
         seasonalList = seasonalList.concat(media);
+        while( pageInfo.hasNextPage ) {
+            console.log(`GETTING PAGE ${variables.page + 1}`)
+            variables.page = variables.page + 1;
+            data = await fetch('https://graphql.anilist.co', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json',
+                },
+                body: JSON.stringify({
+                    query: query,
+                    variables: variables
+                })
+            });
+            data = await data.json();
+            currPage = data.data.Page;
+            pageInfo = currPage.pageInfo;
+            media = currPage.media;
+            seasonalList = seasonalList.concat(media);
+        } 
     }
 
     return seasonalList;
