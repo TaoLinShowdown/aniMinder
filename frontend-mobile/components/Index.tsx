@@ -32,7 +32,6 @@ export default function Index() {
     let [ loaded, setLoaded ] = useState(false); 
 
     useEffect(() => {
-        console.log("fonts were loaded", fontsLoaded);
         changeFontsLoaded(fontsLoaded);
     }, [fontsLoaded])
 

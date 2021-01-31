@@ -31,7 +31,7 @@ export default memo<AnimeCardProps>(props => {
         }
         weekday = days[(new Date(animeData.nextAiringEpisode.airingAt * 1000)).getDay()]
     } else {
-        weekday = "NO DATA";
+        weekday = "FINISHED";
     }
 
     let swipeRef = useRef<Swipeable | null>(null);

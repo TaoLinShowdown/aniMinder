@@ -85,7 +85,7 @@ export default function SeasonalList() {
 
     return (
         <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
-            <SeasonalListNav season="Winter" year="2021" flatListRef={flatListRef} />
+            <SeasonalListNav flatListRef={flatListRef} />
             <FlatList 
                 contentContainerStyle={{
                     backgroundColor: 'rgb(237,241,245)',

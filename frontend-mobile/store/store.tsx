@@ -11,6 +11,7 @@ const initialData: storeType = {
     getFollowingList: () => null,
     changeSeasonalOrder: () => null,
     changeFollowingOrder: () => null,
+    changeSeasonYear: () => null,
     followAnime: () => null,
     unfollowAnime: () => null,
     changeFollowingNeedToReload: () => null,
@@ -24,6 +25,7 @@ const initialData: storeType = {
     fontsLoaded: false,
     seasonalScrollOffsetY: new Animated.Value(0),
     followingScrollOffsetY: new Animated.Value(0),
+    seasonYear: [],
     query: "",
 }
 
@@ -39,6 +41,7 @@ export function useStoreContextValue(): storeType {
     const [ followingNeedToReload, setFollowingNeedToReload ] = useState<boolean>(false);
     const [ seasonalSortOrder, setSeasonalSortOrder ] = useState<string[]>(["TITLE", "false"]);
     const [ followingSortOrder, setFollowingSortOrder ] = useState<string[]>(["AIRING", "false"]);
+    const [ seasonYear, setSeasonYear ] = useState<string[]>(["SPRING", "2020"]);
     const [ query, setQuery ] = useState<string>("");
     const seasonalScrollOffsetY = useRef(new Animated.Value(0)).current;
     const followingScrollOffsetY = useRef(new Animated.Value(0)).current;
@@ -59,6 +62,10 @@ export function useStoreContextValue(): storeType {
         setFollowingNeedToReload(reload);
     }, [setFollowingNeedToReload]);
 
+    const changeSeasonYear = useCallback((sy: string[]) => {
+        setSeasonYear(sy);
+    }, [setSeasonYear])
+
     const changeQuery = useCallback((q: string) => {
         setQuery(q);
     }, [setQuery])
@@ -77,7 +84,7 @@ export function useStoreContextValue(): storeType {
 
     const getSeasonalList = useCallback(() => {
         setListLoading(true);
-        let url = `${api_url}/getSeason?season=WINTER&seasonYear=2021&sort=${seasonalSortOrder[0]}&reverse=${seasonalSortOrder[1]}`;
+        let url = `${api_url}/getSeason?season=${seasonYear[0]}&seasonYear=${seasonYear[1]}&sort=${seasonalSortOrder[0]}&reverse=${seasonalSortOrder[1]}`;
         let options = {
             method: 'GET',
             headers: {
@@ -89,14 +96,14 @@ export function useStoreContextValue(): storeType {
         fetch(url, options)
         .then(response => response.json())
         .then(data => {
-            console.log("SEASON API CALL");
+            console.log("SEASON API CALL", seasonYear[0], seasonYear[1]);
             setAnimeData(data);
             setListLoading(false);
         })
         .catch(err => { 
             console.error(err);
         });
-    }, [animeData, setAnimeData, listLoading, setListLoading, seasonalSortOrder, generateDisplayData])
+    }, [animeData, setAnimeData, listLoading, setListLoading, seasonalSortOrder, generateDisplayData, seasonYear])
 
     const getFollowingList = useCallback(() => {
         setFollowingLoading(true);
@@ -194,7 +201,7 @@ export function useStoreContextValue(): storeType {
         if (!listLoading) {
             getSeasonalList();
         }
-    }, [seasonalSortOrder])
+    }, [seasonalSortOrder, seasonYear])
 
     useEffect(() => {
         if (!followingLoading) {
@@ -212,7 +219,7 @@ export function useStoreContextValue(): storeType {
 
     useEffect(() => {
         (async () => {
-            console.log("UPDATING NOTIFICATIONS");
+            // console.log("UPDATING NOTIFICATIONS");
             let scheduled = await Notifications.getAllScheduledNotificationsAsync();
 
             // get all the identifiers for the scheduled notifications
@@ -244,6 +251,7 @@ export function useStoreContextValue(): storeType {
         getFollowingList,
         changeSeasonalOrder,
         changeFollowingOrder,
+        changeSeasonYear,
         followAnime,
         unfollowAnime,
         changeFollowingNeedToReload,
@@ -257,6 +265,7 @@ export function useStoreContextValue(): storeType {
         fontsLoaded,
         seasonalScrollOffsetY,
         followingScrollOffsetY,
+        seasonYear,
         query
     }
 }

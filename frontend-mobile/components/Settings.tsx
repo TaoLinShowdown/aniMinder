@@ -5,7 +5,7 @@ import { StoreContext } from '../store/store';
 import { anime } from '../common/types';
 
 export default function Settings() {
-    const { animeData } = useContext(StoreContext);
+    const { followingData } = useContext(StoreContext);
     const [ notifs, setNotifs ] = useState<Notifications.NotificationRequest[]>([]);
 
     const handlePress = () => {
@@ -17,7 +17,7 @@ export default function Settings() {
         let scheduled = await Notifications.getAllScheduledNotificationsAsync();
         setNotifs(scheduled);
         scheduled.forEach(notif => {
-            let anime: anime = animeData.filter(anime => notif.identifier === `${anime.id}`)[0];
+            let anime: anime = followingData.filter(anime => notif.identifier === `${anime.id}`)[0];
             console.log(`   [${notif.identifier}] ${anime.title.english} in ${(notif.trigger.seconds/3600).toPrecision(4)} hours`);
         });
     }
@@ -33,7 +33,7 @@ export default function Settings() {
                 onPress={handlePrint}
             />
             {notifs.map(notif => {
-                let anime: anime = animeData.filter(anime => notif.identifier === `${anime.id}`)[0];
+                let anime: anime = followingData.filter(anime => notif.identifier === `${anime.id}`)[0];
                 return (
                     <View key={anime.id}>
                         <Text>{`${anime.title.english?.substring(0, 25)} in ${(notif.trigger.seconds/3600).toPrecision(4)} hours`}</Text>

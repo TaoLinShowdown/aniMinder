@@ -5,8 +5,9 @@ import { StoreContext } from '../store/store';
 import { H_MAX_HEIGHT, H_MIN_HEIGHT } from '../common/constants';
 import { SeasonalListNavProps } from '../common/types';
 
-export default function SeasonalListNav({ season, year, flatListRef }: SeasonalListNavProps) {
+export default function SeasonalListNav({ flatListRef }: SeasonalListNavProps) {
     const { seasonalScrollOffsetY, 
+            seasonYear,
             changeSeasonalOrder,
             changeQuery,
         } = useContext(StoreContext);
@@ -24,11 +25,6 @@ export default function SeasonalListNav({ season, year, flatListRef }: SeasonalL
     const anchorX = seasonalScrollOffsetY.interpolate({
         inputRange: [0, 50, 110],
         outputRange: [0, 0, -30],
-        extrapolate: 'clamp'
-    });
-    const anchorX2 = seasonalScrollOffsetY.interpolate({
-        inputRange: [0, 50, 110],
-        outputRange: [0, 0, -63],
         extrapolate: 'clamp'
     });
     const anchorY = seasonalScrollOffsetY.interpolate({
@@ -105,31 +101,26 @@ export default function SeasonalListNav({ season, year, flatListRef }: SeasonalL
                     position: 'absolute',
                     left: 13,
                     bottom: 10,
+                    transform: [
+                        { scale: fontScale },
+                        { translateX: anchorX },
+                        { translateY: anchorY }
+                    ]
                 }}>
                     <Animated.Text style={{
                         color: '#fff',
                         fontFamily: 'Overpass-Bold',
                         fontSize: 40,
-                        transform: [
-                            { scale: fontScale },
-                            { translateX: anchorX },
-                            { translateY: anchorY },
-                        ],
                     }}>
-                        {season}
+                        {seasonYear[0].charAt(0) + seasonYear[0].toLowerCase().slice(1)}
                     </Animated.Text>
                     <Animated.Text style={{
                         color: 'rgb(110,133,158)',
                         fontFamily: 'Overpass-Bold',
                         fontSize: 16,
                         paddingTop: 23,
-                        transform: [
-                            { scale: fontScale },
-                            { translateX: anchorX2 },
-                            { translateY: anchorY },
-                        ],
                     }}>
-                        {year}
+                        {seasonYear[1]}
                     </Animated.Text>
                 </Animated.View>
 

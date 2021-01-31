@@ -32,6 +32,7 @@ export interface storeType {
     getFollowingList: () => void,
     changeSeasonalOrder: (order: string[]) => void,
     changeFollowingOrder: (order: string[]) => void,
+    changeSeasonYear: (sy: string[]) => void,
     followAnime: (animeIds: number[], callback: () => void) => void,
     unfollowAnime: (animeIds: number[], callback: () => void) => void,
     changeFollowingNeedToReload: (reload: boolean) => void,
@@ -45,12 +46,11 @@ export interface storeType {
     fontsLoaded: boolean,
     seasonalScrollOffsetY: Animated.Value
     followingScrollOffsetY: Animated.Value,
+    seasonYear: string[],
     query: string,
 }
 
 export interface SeasonalListNavProps {
-    season: string,
-    year: string,
     flatListRef: React.MutableRefObject<FlatList | null>
 }
 
