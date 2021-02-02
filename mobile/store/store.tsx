@@ -41,7 +41,7 @@ export function useStoreContextValue(): storeType {
     const [ followingNeedToReload, setFollowingNeedToReload ] = useState<boolean>(false);
     const [ seasonalSortOrder, setSeasonalSortOrder ] = useState<string[]>(["TITLE", "false"]);
     const [ followingSortOrder, setFollowingSortOrder ] = useState<string[]>(["AIRING", "false"]);
-    const [ seasonYear, setSeasonYear ] = useState<string[]>(["SPRING", "2020"]);
+    const [ seasonYear, setSeasonYear ] = useState<string[]>(["WINTER", "2021"]);
     const [ query, setQuery ] = useState<string>("");
     const seasonalScrollOffsetY = useRef(new Animated.Value(0)).current;
     const followingScrollOffsetY = useRef(new Animated.Value(0)).current;

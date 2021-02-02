@@ -1,7 +1,7 @@
 node_modules/**/*
 .expo/*
-frontend-mobile/.expo/*
-frontend-mobile/node_modules/**/*
+mobile/.expo/*
+mobile/node_modules/**/*
 npm-debug.*
 *.zip
 *.jks

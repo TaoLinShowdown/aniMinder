@@ -4,12 +4,14 @@ import { Ionicons } from '@expo/vector-icons';
 import { StoreContext } from '../store/store';
 import { H_MAX_HEIGHT, H_MIN_HEIGHT } from '../common/constants';
 import { SeasonalListNavProps } from '../common/types';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 export default function SeasonalListNav({ flatListRef }: SeasonalListNavProps) {
     const { seasonalScrollOffsetY, 
             seasonYear,
             changeSeasonalOrder,
             changeQuery,
+            changeSeasonYear
         } = useContext(StoreContext);
 
     const headerScrollHeight = seasonalScrollOffsetY.interpolate({
@@ -77,9 +79,42 @@ export default function SeasonalListNav({ flatListRef }: SeasonalListNavProps) {
         )
     }
 
+    const selectSeason = () => {
+        ActionSheetIOS.showActionSheetWithOptions({
+            cancelButtonIndex: 0,
+            options: [
+                "Cancel",
+                "Winter 2021",
+                "Fall 2020",
+                "Summer 2020",
+                "Spring 2020",
+                "Winter 2020"
+            ]
+        },
+        btnIndex => {
+            if (btnIndex === 1) {
+                flatListRef.current?.scrollToOffset({animated: true, offset: 0});
+                changeSeasonYear(["WINTER", "2021"]);
+            } else if (btnIndex === 2) {
+                flatListRef.current?.scrollToOffset({animated: true, offset: 0});
+                changeSeasonYear(["FALL", "2020"]);
+            } else if (btnIndex === 3) {
+                flatListRef.current?.scrollToOffset({animated: true, offset: 0});
+                changeSeasonYear(["SUMMER", "2020"]);
+            } else if (btnIndex === 4) {
+                flatListRef.current?.scrollToOffset({animated: true, offset: 0});
+                changeSeasonYear(["SPRING", "2020"]);
+            } else if (btnIndex === 5) {
+                flatListRef.current?.scrollToOffset({animated: true, offset: 0});
+                changeSeasonYear(["WINTER", "2020"]);
+            }
+        })
+    }
+
     const handleSearch = (e: NativeSyntheticEvent<TextInputEndEditingEventData>) => {
         changeQuery(e.nativeEvent.text);
     }
+
 
     return (
         <React.Fragment>
@@ -96,8 +131,6 @@ export default function SeasonalListNav({ flatListRef }: SeasonalListNavProps) {
             }}>
                 
                 <Animated.View style={{
-                    flex: 1,
-                    flexDirection: 'row',
                     position: 'absolute',
                     left: 13,
                     bottom: 10,
@@ -107,30 +140,39 @@ export default function SeasonalListNav({ flatListRef }: SeasonalListNavProps) {
                         { translateY: anchorY }
                     ]
                 }}>
-                    <Animated.Text style={{
-                        color: '#fff',
-                        fontFamily: 'Overpass-Bold',
-                        fontSize: 40,
+                    <TouchableOpacity onPress={selectSeason} style={{
+                        flex: 1,
+                        flexDirection: 'row',
                     }}>
-                        {seasonYear[0].charAt(0) + seasonYear[0].toLowerCase().slice(1)}
-                    </Animated.Text>
-                    <Animated.Text style={{
-                        color: 'rgb(110,133,158)',
-                        fontFamily: 'Overpass-Bold',
-                        fontSize: 16,
-                        paddingTop: 23,
-                    }}>
-                        {seasonYear[1]}
-                    </Animated.Text>
+                        <Animated.Text style={{
+                            color: '#fff',
+                            fontFamily: 'Overpass-Bold',
+                            fontSize: 40,
+                        }}>
+                            {seasonYear[0].charAt(0) + seasonYear[0].toLowerCase().slice(1)}
+                        </Animated.Text>
+                        <Animated.Text style={{
+                            color: 'rgb(110,133,158)',
+                            fontFamily: 'Overpass-Bold',
+                            fontSize: 16,
+                            paddingTop: 23,
+                        }}>
+                            {seasonYear[1]}
+                        </Animated.Text>
+                        <Ionicons name="caret-down-outline" color="rgb(110,133,158)" size={16} style={{
+                            paddingTop: 25,
+                            paddingLeft: 4
+                        }}/>
+                    </TouchableOpacity>
                 </Animated.View>
-
-                <Ionicons name="swap-vertical" color="white" size={28} 
-                onPress={openSort}
-                style={{
+                
+                <TouchableOpacity onPress={openSort} containerStyle={{
                     position: 'absolute',
                     right: 10,
                     top: 53
-                }} />
+                }}>
+                    <Ionicons name="swap-vertical" color="white" size={28} />
+                </TouchableOpacity>
             </Animated.View>
             <Animated.View style={{
                 height: 40,

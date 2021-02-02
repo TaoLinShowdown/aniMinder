@@ -1,5 +1,5 @@
 import React, { useContext, useRef, useState } from 'react';
-import { Animated, View, FlatList, Image, Text, TextInput } from 'react-native';
+import { Animated, View, FlatList, Image, Text } from 'react-native';
 import AnimeCard from './AnimeCard';
 import { StoreContext } from '../store/store';
 import SeasonalListNav from './SeasonalListNav';

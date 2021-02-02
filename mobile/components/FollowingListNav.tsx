@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { StoreContext } from '../store/store';
 import { FollowingListNavProps } from '../common/types'
 import { H_MAX_HEIGHT, H_MIN_HEIGHT, H_SCROLL_DISTANCE } from '../common/constants';
+import { TouchableOpacity } from 'react-native-gesture-handler';
 
 export default function FollowingListNav({ flatListRef }: FollowingListNavProps) {
     const { followingScrollOffsetY, 
@@ -101,13 +102,13 @@ export default function FollowingListNav({ flatListRef }: FollowingListNavProps)
                 Following
             </Animated.Text>
 
-            <Ionicons name="swap-vertical" color="white" size={28} 
-            onPress={openSort}
-            style={{
+            <TouchableOpacity onPress={openSort} containerStyle={{
                 position: 'absolute',
                 right: 10,
                 top: 53
-            }} />
+            }}>
+                <Ionicons name="swap-vertical" color="white" size={28} />
+            </TouchableOpacity>
         </Animated.View>
     )
 }
