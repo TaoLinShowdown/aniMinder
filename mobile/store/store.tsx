@@ -4,6 +4,7 @@ import Constants from 'expo-constants';
 import { storeType, anime } from '../common/types';
 import { api_url } from '../common/constants';
 import * as Notifications from 'expo-notifications';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const initialData: storeType = {
     changeFontsLoaded: () => null,
@@ -71,15 +72,25 @@ export function useStoreContextValue(): storeType {
     }, [setQuery])
 
     const generateDisplayData = useCallback(() => {
-        if(query === "") {
-            setAnimeDataDisplayed(animeData);
-        } else {
-            setAnimeDataDisplayed(animeData.filter((anime: anime) => {
-                return (anime.title.english !== null && anime.title.english.includes(query)) ||
-                        (anime.title.romaji !== null && anime.title.romaji.includes(query)) ||
-                        (anime.title.native !== null && anime.title.native.includes(query));
-            }))
-        }
+        (async () => {
+            let settings = await AsyncStorage.getItem('aniMinder-settings');
+            if (settings !== null) {
+                let s = JSON.parse(settings);
+                if (query === "") {
+                    if (s.hide) {
+                        setAnimeDataDisplayed(animeData.filter((anime: anime) => anime.nextAiringEpisode !== null));
+                    } else {
+                        setAnimeDataDisplayed(animeData);
+                    }
+                } else {
+                    setAnimeDataDisplayed(animeData.filter((anime: anime) => {
+                        return ((anime.title.english !== null && anime.title.english.includes(query)) ||
+                                (anime.title.romaji !== null && anime.title.romaji.includes(query)) ||
+                                (anime.title.native !== null && anime.title.native.includes(query))) && (s.hide ? anime.nextAiringEpisode !== null : true);
+                    }));
+                }
+            }
+        })();
     }, [setAnimeDataDisplayed, animeData, query])
 
     const getSeasonalList = useCallback(() => {
