@@ -1,5 +1,5 @@
 import React, { useContext, useRef, useState } from 'react'
-import { View, FlatList, Animated, Image, Text } from 'react-native';
+import { View, FlatList, Animated, Text } from 'react-native';
 import { StoreContext } from '../store/store';
 
 import AnimeCard from './AnimeCard';
@@ -13,9 +13,6 @@ export default function FollowingList() {
         } = useContext(StoreContext);
     const [ notifAnimeName, setNotifAnimeName ] = useState<String>("");
     let flatListRef = useRef<FlatList | null>(null);
-
-    const headerComponent = () => 
-    <Image style={{ width: 60, height: 60 }} source={require('../assets/Spin-1s-200px.gif')}/>
 
     const emptyComponent = () =>
     <View style={{
@@ -89,13 +86,11 @@ export default function FollowingList() {
             <FlatList 
                 contentContainerStyle={{
                     backgroundColor: 'rgb(237,241,245)',
-                    paddingTop: 20
+                    paddingTop: 150
                 }}
                 scrollEventThrottle={16}
                 onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: followingScrollOffsetY } } }], { useNativeDriver: false })}
                 data={followingData}
-                ListHeaderComponent={headerComponent}
-                ListHeaderComponentStyle={{ alignItems: 'center', paddingBottom: 70 }}
                 ListEmptyComponent={emptyComponent}
                 renderItem={item => <AnimeCard type={"Delete"} animeData={item.item} startAnimation={notifAnim} setAnimeName={setNotifAnimeName} />}
                 keyExtractor={item => item.id.toString()}

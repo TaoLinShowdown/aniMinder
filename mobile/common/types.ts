@@ -70,3 +70,8 @@ export type RootStackParamList = {
     Seasonal: undefined,
     Settings: undefined
 }
+
+export type asyncSettings = {
+    enableNotif: boolean,
+    hide: boolean
+}

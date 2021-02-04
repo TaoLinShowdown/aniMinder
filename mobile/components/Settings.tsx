@@ -1,11 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import { View, Text, Switch, StyleSheet } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as Notifications from 'expo-notifications';
+import { asyncSettings, anime } from '../common/types';
+import { StoreContext } from '../store/store';
 
 export default function Settings() {
     let [ notifToggle, setNotifToggle ] = useState<boolean>(true);
     let [ hideToggle, setHideToggle ] = useState<boolean>(false);
     let [ loaded, setLoaded ] = useState<boolean>(false);
+
+    const { followingData } = useContext(StoreContext);
 
     useEffect(() => {
         if (!loaded) {
@@ -26,18 +31,53 @@ export default function Settings() {
         }
     })
 
-    const toggleNotif = () => {
-        setNotifToggle(!notifToggle);
+    useEffect(() => {
+        if (!notifToggle) {
+            console.log("NO NOTIFICATIONS")
+            Notifications.setNotificationHandler({
+                handleNotification: async () => ({
+                    shouldShowAlert: false,
+                    shouldPlaySound: false,
+                    shouldSetBadge: false,
+                })
+            })
+        } else {
+            console.log("YES NOTIFICATIONS")
+            Notifications.setNotificationHandler({
+                handleNotification: async (notif) => {
+                    let theAnime: anime = followingData.filter(anime => `${anime.id}` === notif.request.identifier)[0];
+                    if (theAnime.nextAiringEpisode !== null && (new Date(theAnime.nextAiringEpisode.airingAt * 1000) > (new Date()))) {
+                        console.log(`SCHEDULING NEXT NOTIFICATION FOR ${theAnime.title.english}`);
+                        Notifications.scheduleNotificationAsync({
+                            identifier: notif.request.identifier,
+                            content: {
+                                title: `${theAnime.title.english} ep ${theAnime.nextAiringEpisode.episode} is airing now!`
+                            },
+                            trigger: new Date(theAnime.nextAiringEpisode.airingAt * 1000)
+                        })
+                    }
+                    return {
+                        shouldShowAlert: true,
+                        shouldPlaySound: false,
+                        shouldSetBadge: false,
+                    }
+                },
+            });
+        }
         (async () => {
             const settings = await AsyncStorage.getItem('aniMinder-settings');
             if (settings !== null) {
-                let s = JSON.parse(settings);
+                let s: asyncSettings = JSON.parse(settings);
                 await AsyncStorage.setItem('aniMinder-settings', JSON.stringify({
                     enableNotif: !s.enableNotif,
                     hide: s.hide
                 }));
             }
         })();
+    }, [notifToggle])
+
+    const toggleNotif = () => {
+        setNotifToggle(!notifToggle);   
     }
 
     const toggleHide = () => {
@@ -45,7 +85,7 @@ export default function Settings() {
         (async () => {
             const settings = await AsyncStorage.getItem('aniMinder-settings');
             if (settings !== null) {
-                let s = JSON.parse(settings);
+                let s: asyncSettings = JSON.parse(settings);
                 await AsyncStorage.setItem('aniMinder-settings', JSON.stringify({
                     enableNotif: s.enableNotif,
                     hide: !s.hide

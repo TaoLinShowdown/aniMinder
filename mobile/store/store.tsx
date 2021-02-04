@@ -1,7 +1,7 @@
 import { createContext, useCallback, useState, useRef, useEffect } from 'react';
 import { Animated } from 'react-native';
 import Constants from 'expo-constants';
-import { storeType, anime } from '../common/types';
+import { storeType, anime, asyncSettings } from '../common/types';
 import { api_url } from '../common/constants';
 import * as Notifications from 'expo-notifications';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -106,7 +106,7 @@ export function useStoreContextValue(): storeType {
         };
         fetch(url, options)
         .then(response => response.json())
-        .then(data => {
+        .then((data: anime[]) => {
             console.log("SEASON API CALL", seasonYear[0], seasonYear[1]);
             setAnimeData(data);
             setListLoading(false);
@@ -131,10 +131,24 @@ export function useStoreContextValue(): storeType {
         }
         fetch(url, options)
         .then(response => response.json())
-        .then(data => {
+        .then((data: anime[]) => {
             console.log("FOLLOWING API CALL");
-            setFollowingData(data);
-            setFollowingLoading(false);
+            AsyncStorage.getItem('aniMinder-settings')
+            .then(res => {
+                if (res !== null) {
+                    let settings: asyncSettings = JSON.parse(res);
+                    if (settings.hide) {
+                        setFollowingData(data.filter((anime: anime) => anime.nextAiringEpisode !== null));
+                    } else {
+                        setFollowingData(data);
+                    }
+                    setFollowingLoading(false);
+                } else {
+                    setFollowingData(data);
+                    setFollowingLoading(false);
+                }
+            })
+            .catch(err => console.error(err));
         })
         .catch(err => {
             console.error(err);

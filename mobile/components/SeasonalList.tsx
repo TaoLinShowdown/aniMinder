@@ -1,5 +1,5 @@
 import React, { useContext, useRef, useState } from 'react';
-import { Animated, View, FlatList, Image, Text } from 'react-native';
+import { Animated, View, FlatList, Text } from 'react-native';
 import AnimeCard from './AnimeCard';
 import { StoreContext } from '../store/store';
 import SeasonalListNav from './SeasonalListNav';
@@ -13,9 +13,6 @@ export default function SeasonalList() {
 
     const [ notifAnimeName, setNotifAnimeName ] = useState<String>("");
     let flatListRef = useRef<FlatList | null>(null);
-
-    const HeaderComponent = () =>
-        <Image style={{ width: 60, height: 60, marginBottom: 80 }} source={require('../assets/Spin-1s-200px.gif')}/>
 
     const emptyComponent = () => 
         <View style={{
@@ -89,18 +86,13 @@ export default function SeasonalList() {
             <FlatList 
                 contentContainerStyle={{
                     backgroundColor: 'rgb(237,241,245)',
-                    paddingTop: 60
+                    paddingTop: 200
                 }}
                 scrollEventThrottle={16}
                 onScroll={Animated.event([{ nativeEvent: { contentOffset: { y: seasonalScrollOffsetY } } }], { useNativeDriver: false })}
                 data={animeDataDisplayed}
-                ListHeaderComponent={HeaderComponent}
-                ListHeaderComponentStyle={{ alignItems: 'center' }}
                 ListEmptyComponent={emptyComponent}
                 renderItem={item => <AnimeCard type={"Add"} animeData={item.item} startAnimation={notifAnim} setAnimeName={setNotifAnimeName} />}
-                initialNumToRender={6}
-                maxToRenderPerBatch={6}
-                updateCellsBatchingPeriod={100}
                 keyExtractor={item => item.id.toString()}
                 onRefresh={getSeasonalList}
                 refreshing={listLoading}
