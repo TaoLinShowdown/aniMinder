@@ -73,5 +73,7 @@ export type RootStackParamList = {
 
 export type asyncSettings = {
     enableNotif: boolean,
-    hide: boolean
+    hide: boolean,
+    enableDelay: boolean,
+    delay: number
 }

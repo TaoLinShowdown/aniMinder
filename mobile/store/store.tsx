@@ -156,15 +156,18 @@ export function useStoreContextValue(): storeType {
     }, [followingData, setFollowingData, followingLoading, setFollowingLoading, followingSortOrder])
 
     const scheduleNotification = useCallback((anime: anime) => {
-        if (anime.nextAiringEpisode !== null  && (new Date(anime.nextAiringEpisode.airingAt * 1000) > (new Date()))) {
-            Notifications.scheduleNotificationAsync({
-                identifier: `${anime.id}`,
-                trigger: new Date(anime.nextAiringEpisode.airingAt * 1000),
-                content: {
-                    title: `${anime.title.english} ep ${anime.nextAiringEpisode.episode} is airing now!`,
-                    
-                }
-            });
+        if (anime.nextAiringEpisode !== null) {
+            let scheduleDate: Date = new Date(anime.nextAiringEpisode.airingAt * 1000);
+            if (scheduleDate > new Date()) {
+                Notifications.scheduleNotificationAsync({
+                    identifier: `${anime.id}`,
+                    trigger: new Date(anime.nextAiringEpisode.airingAt * 1000),
+                    content: {
+                        title: `${anime.title.english} ep ${anime.nextAiringEpisode.episode} is airing now!`,
+                        
+                    }
+                });
+            }
         }
     }, [])
 
@@ -256,15 +259,8 @@ export function useStoreContextValue(): storeType {
             // schedule notifications for anime that do not have notifications
             followingData.forEach(async anime => {
                 let id = `${anime.id}`;
-                if (!scheduledIdentifiers.includes(id) && anime.nextAiringEpisode !== null && (new Date(anime.nextAiringEpisode.airingAt * 1000) > (new Date()))) {
-                    console.log(`   [NOTIF] added notif for ${anime.title.english}`)
-                    await Notifications.scheduleNotificationAsync({
-                        identifier: id,
-                        trigger: new Date(anime.nextAiringEpisode.airingAt * 1000),
-                        content: {
-                            body: `${anime.title.english} ep ${anime.nextAiringEpisode.episode} is airing now!`
-                        }
-                    });
+                if (!scheduledIdentifiers.includes(id)) {
+                    scheduleNotification(anime);
                 }
             });
         })();
