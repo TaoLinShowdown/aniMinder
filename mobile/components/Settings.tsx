@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useContext } from 'react';
-import { View, Text, Switch, StyleSheet } from 'react-native';
+import { View, Text, Switch, StyleSheet, Button } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import * as Notifications from 'expo-notifications';
@@ -13,7 +13,7 @@ export default function Settings() {
     let [ delay, setDelay ] = useState<Date>(new Date(1970, 12, 1, 0, 1, 0));
     let [ loaded, setLoaded ] = useState<boolean>(false);
 
-    const { followingData } = useContext(StoreContext);
+    const { followingData, getFollowingList, scheduleNotification } = useContext(StoreContext);
 
     useEffect(() => {
         if (!loaded) {
@@ -51,17 +51,8 @@ export default function Settings() {
         } else {
             Notifications.setNotificationHandler({
                 handleNotification: async (notif) => {
-                    let theAnime: anime = followingData.filter(anime => `${anime.id}` === notif.request.identifier)[0];
-                    if (theAnime.nextAiringEpisode !== null && (new Date(theAnime.nextAiringEpisode.airingAt * 1000) > (new Date()))) {
-                        console.log(`SCHEDULING NEXT NOTIFICATION FOR ${theAnime.title.english}`);
-                        Notifications.scheduleNotificationAsync({
-                            identifier: notif.request.identifier,
-                            content: {
-                                title: `${theAnime.title.english} ep ${theAnime.nextAiringEpisode.episode} is airing now!`
-                            },
-                            trigger: new Date(theAnime.nextAiringEpisode.airingAt * 1000)
-                        })
-                    }
+                    let anime: anime = followingData.filter(anime => `${anime.id}` === notif.request.identifier)[0];
+                    scheduleNotification(anime);
                     return {
                         shouldShowAlert: true,
                         shouldPlaySound: false,
@@ -74,7 +65,7 @@ export default function Settings() {
 
     const handleDelayChange = (date: Date) => {
         let hours = date.getHours(), minutes = date.getMinutes();
-        console.log(hours, minutes);
+        console.log(`Delay set to ${hours} hours and ${minutes} minutes`);
         (async () => {
             let seconds = (hours * 3600) + (minutes * 60);
             setDelay(new Date(1970, 12, 1, hours, minutes, 0));
@@ -87,6 +78,9 @@ export default function Settings() {
                     enableDelay: s.enableDelay,
                     delay: seconds
                 }));
+                // reschedule all notifications
+                await Notifications.cancelAllScheduledNotificationsAsync();
+                getFollowingList();
             } 
         })();
     }
@@ -160,6 +154,23 @@ export default function Settings() {
             {delayToggle && <View style={{...styles.dateContainer, borderBottomWidth: 1}}>
                 <DateTimePicker style={{flex: 1}} mode="countdown" display="spinner" onChange={(e, date) => {handleDelayChange(date as Date)}} value={delay}/>
             </View>}
+            <Button title="show notifications" onPress={() => {
+                Notifications.getAllScheduledNotificationsAsync().then(notifs => {
+                    if (notifs.length !== 0) {
+                        console.log("PRINTING ALL NOTIFICATIONS");
+                    } else {
+                        console.log("NO NOTIFICATIONS SCHEDULED");
+                    }
+                    notifs.forEach(n => {
+                        let id = n.identifier;
+                        let anime: anime = followingData.filter(anime => `${anime.id}` === id)[0];
+                        console.log(`   [${id}] ${anime.title.english} in ${n.trigger.seconds/3600} hours`);
+                    })
+                })
+            }}/>
+            <Button title="clear notifications" onPress={() => {
+                Notifications.cancelAllScheduledNotificationsAsync();
+            }} />
         </View>
     );
 }

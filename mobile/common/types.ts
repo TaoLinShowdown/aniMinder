@@ -37,6 +37,7 @@ export interface storeType {
     unfollowAnime: (animeIds: number[], callback: () => void) => void,
     changeFollowingNeedToReload: (reload: boolean) => void,
     changeQuery: (q: string) => void,
+    scheduleNotification: (anime: anime) => void,
     animeData: anime[],
     animeDataDisplayed: anime[],
     followingData: anime[],

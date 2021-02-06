@@ -17,6 +17,7 @@ const initialData: storeType = {
     unfollowAnime: () => null,
     changeFollowingNeedToReload: () => null,
     changeQuery: () => null,
+    scheduleNotification: () => null,
     animeData: [],
     animeDataDisplayed: [],
     followingData: [],
@@ -156,19 +157,28 @@ export function useStoreContextValue(): storeType {
     }, [followingData, setFollowingData, followingLoading, setFollowingLoading, followingSortOrder])
 
     const scheduleNotification = useCallback((anime: anime) => {
-        if (anime.nextAiringEpisode !== null) {
-            let scheduleDate: Date = new Date(anime.nextAiringEpisode.airingAt * 1000);
-            if (scheduleDate > new Date()) {
-                Notifications.scheduleNotificationAsync({
-                    identifier: `${anime.id}`,
-                    trigger: new Date(anime.nextAiringEpisode.airingAt * 1000),
-                    content: {
-                        title: `${anime.title.english} ep ${anime.nextAiringEpisode.episode} is airing now!`,
-                        
-                    }
-                });
+        (async () => {
+            let res = await AsyncStorage.getItem('aniMinder-settings');
+            if (anime.nextAiringEpisode !== null && res !== null) {
+                let settings: asyncSettings = JSON.parse(res);
+                let scheduleDate: Date = new Date();
+                if (settings.enableDelay) {
+                    scheduleDate = new Date((anime.nextAiringEpisode.airingAt - settings.delay) * 1000);
+                } else {
+                    scheduleDate = new Date((anime.nextAiringEpisode.airingAt) * 1000);
+                }
+                if (scheduleDate > new Date()) {
+                    Notifications.scheduleNotificationAsync({
+                        identifier: `${anime.id}`,
+                        trigger: scheduleDate,
+                        content: {
+                            title: `${anime.title.english} ep ${anime.nextAiringEpisode.episode} is airing now!`,
+                            
+                        }
+                    });
+                }
             }
-        }
+        })();
     }, [])
 
     const followAnime = useCallback((animeIds: number[], callback: () => void) => {
@@ -277,6 +287,7 @@ export function useStoreContextValue(): storeType {
         unfollowAnime,
         changeFollowingNeedToReload,
         changeQuery,
+        scheduleNotification,
         animeData,
         animeDataDisplayed,
         followingData,

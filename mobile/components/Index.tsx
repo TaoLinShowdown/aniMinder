@@ -19,6 +19,7 @@ export default function Index() {
     const { changeFontsLoaded, 
             getFollowingList, 
             changeFollowingNeedToReload,
+            scheduleNotification,
             followingNeedToReload, 
             followingData,
         } = useContext(StoreContext);
@@ -50,17 +51,8 @@ export default function Index() {
             })
             Notifications.setNotificationHandler({
                 handleNotification: async (notif) => {
-                    let theAnime: anime = followingData.filter(anime => `${anime.id}` === notif.request.identifier)[0];
-                    if (theAnime.nextAiringEpisode !== null && (new Date(theAnime.nextAiringEpisode.airingAt * 1000) > (new Date()))) {
-                        console.log(`SCHEDULING NEXT NOTIFICATION FOR ${theAnime.title.english}`);
-                        Notifications.scheduleNotificationAsync({
-                            identifier: notif.request.identifier,
-                            content: {
-                                title: `${theAnime.title.english} ep ${theAnime.nextAiringEpisode.episode} is airing now!`
-                            },
-                            trigger: new Date(theAnime.nextAiringEpisode.airingAt * 1000)
-                        })
-                    }
+                    let anime: anime = followingData.filter(anime => `${anime.id}` === notif.request.identifier)[0];
+                    scheduleNotification(anime);
                     return {
                         shouldShowAlert: true,
                         shouldPlaySound: false,
