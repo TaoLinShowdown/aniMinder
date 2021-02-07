@@ -11,14 +11,14 @@
 
 <!-- ABOUT -->
 ## About
-aniMinder allows users to follow airing shows in the current season of anime. Following shows also triggers the app the schedule a notification to trigger when the show begins airing. The times of shows airing are gathered from the [AniList API] (https://anilist.gitbook.io/anilist-apiv2-docs/) and stored in the backend database which is updated every hour. Users are also given the option to delay the notification so it may, for example, trigger an hour before the show starts.
+aniMinder allows users to follow airing shows in the current season of anime. Following shows also triggers the app the schedule a notification to trigger when the show begins airing. The times of shows airing are gathered from the [AniList API](https://anilist.gitbook.io/anilist-apiv2-docs/) and stored in the backend database which is updated every hour. Users are also given the option to delay the notification so it may, for example, trigger an hour before the show starts.
 
 ## Screenshots
 
 
 ## Built With
-- [Mobile App] (/mobile)
+- [Mobile App](/mobile)
     - React Native
     - Expo
-- [Backend] (/backend-aws)
+- [Backend](/backend-aws)
     - Node
