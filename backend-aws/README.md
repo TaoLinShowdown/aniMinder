@@ -4,6 +4,7 @@
 The backend of aniMinder is on AWS using a combination of API Gateway, Lambda, DynamoDB, and Cloudwatch Event. 
 
 ## Diagram
+![diagram](../screenshots/backend.png)
 
 ## Lambda Functions 
 - **getAnime:** Gets a specific anime based on the id
