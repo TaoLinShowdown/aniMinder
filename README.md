@@ -21,6 +21,9 @@ aniMinder allows users to follow airing shows in the current season of anime. Fo
 ![searching](screenshots/searching.gif) ![sorting](screenshots/sorting.gif)
 
 #### Hiding finished shows
+While the Fall 2020 season is mostly finished, there are still some shows still airing. Enabling the **hide finished shows** option makes seeing these shows easier.
+
+![hiding](screenshots/hiding-finished.gif)
 
 #### Getting a notification
 <img src="screenshots/notification.png" height="480" width="222">
