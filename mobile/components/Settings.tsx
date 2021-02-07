@@ -154,7 +154,7 @@ export default function Settings() {
             {delayToggle && <View style={{...styles.dateContainer, borderBottomWidth: 1}}>
                 <DateTimePicker style={{flex: 1}} mode="countdown" display="spinner" onChange={(e, date) => {handleDelayChange(date as Date)}} value={delay}/>
             </View>}
-            <Button title="show notifications" onPress={() => {
+            {/* <Button title="show notifications" onPress={() => {
                 Notifications.getAllScheduledNotificationsAsync().then(notifs => {
                     if (notifs.length !== 0) {
                         console.log("PRINTING ALL NOTIFICATIONS");
@@ -170,7 +170,7 @@ export default function Settings() {
             }}/>
             <Button title="clear notifications" onPress={() => {
                 Notifications.cancelAllScheduledNotificationsAsync();
-            }} />
+            }} /> */}
         </View>
     );
 }
