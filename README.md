@@ -5,7 +5,7 @@
     </a>
     <h3 align="center">aniMinder</h3>
     <p align="center">
-        An IOS app that sends notifications when seasonal anime shows begin airing
+        An iOS app that sends notifications when seasonal anime shows begin airing
     </p>
 </p>
 
